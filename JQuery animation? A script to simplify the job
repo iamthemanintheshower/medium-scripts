@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JQuery animation? A script to simplify the job</title>
+  <style>#draggable { width: 150px; height: 150px; padding: 0.5em; }</style>
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script>
+  $( function() {
+        var positions_ary = [];
+
+        $(document).on('click', '#show_me_recorded_movement', function(event) {
+            positions_ary.reverse();
+            positions_ary.pop();
+            recorded_data.innerHTML = recorded_data.innerHTML + JSON.stringify(positions_ary);
+            move_it();
+        });
+
+        var previous_ts = 0;
+        $( "#draggable" ).draggable({
+            drag: function( event, ui ) {
+                var timeStampInMs = window.performance && window.performance.now && window.performance.timing && window.performance.timing.navigationStart ? window.performance.now() + window.performance.timing.navigationStart : Date.now();
+                positions_ary.push({timeStampInMs: timeStampInMs, duration: timeStampInMs - previous_ts, ui: ui});
+                previous_ts = timeStampInMs;
+            },
+            
+            start: function( event, ui ) {
+                console.log('START: ' + ui.position.top);
+            },
+            
+            stop: function( event, ui ) {
+                console.log('STOP: ' + ui.position.top);
+            }
+        });
+        
+        
+        var i = 0;
+        function move_it(){
+            i++;
+            if (typeof positions_ary[i] !== 'undefined') {
+                var duration = positions_ary[i].duration;
+                $('#draggable').animate({
+                    top: positions_ary[i].ui.position.top,
+                    left: positions_ary[i].ui.position.left
+                   },
+                   {
+                     duration: duration,
+                     complete: move_it()
+                });
+            }
+        }
+    });
+  </script>
+</head>
+
+<body>
+ 
+<div id="draggable" class="ui-widget-content"><p>Drag me around</p></div>
+<button id="show_me_recorded_movement">show_me_recorded_movement</button>
+<br>
+<br>
+<br>
+<textarea id="recorded_data"></textarea>
+
+</body>
+</html>
