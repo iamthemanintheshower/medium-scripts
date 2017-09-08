@@ -1,0 +1,21 @@
+<?php
+$url = "http://www.google.it";
+$site = file_get_contents($url);
+libxml_use_internal_errors(true);
+$dom = DOMDocument::loadHTML($site);
+
+$aryTagsToSetID = array('p', 'h1', 'h2', 'h3', 'h4', 'i', 'img', 'div');
+foreach ($aryTagsToSetID as $tag){ setID($dom, $tag); }
+
+$html = $dom->saveHTML();
+
+echo $html;
+
+
+function setID($dom, $tag){
+    foreach($dom->getElementsByTagName($tag) as $element ){
+	if(null !== $element->getAttribute('id') && $element->getAttribute('id') === ''){
+		$element->setAttribute('id', 'id_'.uniqid());
+	}
+    }
+}
