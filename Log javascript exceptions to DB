@@ -1,0 +1,14 @@
+window.onerror = function (message, source, lineno, columnno, error) {
+    sendError(message, source, lineno, columnno, error);
+}
+
+function sendError(message, source, lineno, columnno, error){
+    $.post( "log/public_html/WS-log.php", { message: message, line: lineno, source:source, columnno: columnno, error:error, token: token} , function(data) {
+
+    }, "json")
+    .fail(function() {
+      alert('En error has occured. Please, advice the administrator by your self because I can\'t!');
+      location.reload();
+    });
+    return true;
+}
